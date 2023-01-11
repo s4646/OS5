@@ -36,8 +36,12 @@ int getNumOfItems(Queue *self) {return self->numOfItems;}
 Item *getlast(Queue *self) {return self->last;}
 Item *getfirst(Queue *self) {return self->first;}
 
-void enqueue(Queue *self, Item *i)
+void *enqueue(void *a)
 {
+    Queue *self = ((args *)a)->self;
+    Item *i = ((args *)a)->i;
+
+    pthread_mutex_lock(&(self->lock));    /* lock */
     if (self->numOfItems == 0)
     {
         self->last = i;
@@ -56,10 +60,16 @@ void enqueue(Queue *self, Item *i)
         self->last = i;
     }
     self->numOfItems++;
+    pthread_mutex_unlock(&(self->lock));    /* unlock */
+
+    return NULL;
 }
 
-void dequeue(Queue *self)
+void *dequeue(void *a)
 {
+    Queue *self = ((args *)a)->self;
+
+    pthread_mutex_lock(&(self->lock));    /* lock */
     if (getNumOfItems(self) > 1)
     {
         Item *temp = getfirst(self);
@@ -80,6 +90,9 @@ void dequeue(Queue *self)
     {
         printf("dequeue empty queue is not possible!\n");
     }
+    pthread_mutex_unlock(&(self->lock));    /* unlock */
+
+    return NULL;
 }
 
 Queue *initQueue()
@@ -88,15 +101,24 @@ Queue *initQueue()
     q->last = NULL;
     q->first = NULL;
     q->numOfItems = 0;
+    if (pthread_mutex_init(&(q->lock), NULL) != 0) // init lock
+    {
+        printf("mutex init has failed\n");
+        exit(1);
+    }
     return q;
 }
 void freeQueue(Queue *self)
 {
+    args a = {self, NULL};
+
     int items = getNumOfItems(self);
     for (size_t i = 0; i < items; i++)
     {
-        dequeue(self);
+        dequeue(&a);
     }
+
+    pthread_mutex_destroy(&(self->lock)); // destroy lock
     free(self);
 }
 /**

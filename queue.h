@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 
 typedef struct Item
 {
@@ -22,12 +23,19 @@ typedef struct Queue
 {
     Item *first; // to enter queue
     Item *last;  // to enter queue
+    pthread_mutex_t lock;
     int numOfItems;
 } Queue;
 Queue *initQueue();
-void enqueue(Queue *self, Item *i);
-void dequeue(Queue *self);
+void *enqueue(void *a);
+void *dequeue(void *a);
 int getNumOfItems(Queue *self);
 Item *getfirst(Queue *self);
 Item *getlast(Queue *self);
 void freeQueue(Queue *self);
+
+typedef struct args
+{
+    Queue *self;
+    Item *i;
+} args;

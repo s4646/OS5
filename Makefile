@@ -5,7 +5,7 @@ FLAGS = -Wall -Werror -g
 all: main
 
 main: queue.o main.o
-	$(CC) $^ -o main
+	$(CC) $^ -lpthread -o main
 
 main.o: main.c
 	$(CC) $(FLAGS) -c main.c
