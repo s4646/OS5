@@ -1,17 +1,21 @@
 PHONY = all clean
 CC = gcc
 FLAGS = -Wall -Werror -g
+C++ = -lstdc++
 
 all: main
 
-main: queue.o main.o
-	$(CC) $^ -lpthread -o main
+main: queue.o main.o # activeObject.o
+	$(CC) $^ -o main $(C++)
 
-main.o: main.c
-	$(CC) $(FLAGS) -c main.c
+main.o: main.cpp
+	$(CC) $(FLAGS) -c $^ $(C++)
 
-queue.o: queue.c
-	$(CC) $(FLAGS) -c queue.c
+queue.o: queue.cpp
+	$(CC) $(FLAGS) -c $^ $(C++)
+
+# activeObject.o: activeObject.cpp
+# 	$(CC) $(FLAGS) -c $^ $(C++)
 
 
 clean:
