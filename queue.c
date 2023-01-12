@@ -38,10 +38,10 @@ Item *getfirst(Queue *self) {return self->first;}
 
 void *enqueue(void *a)
 {
-    Queue *self = ((args *)a)->self;
-    Item *i = ((args *)a)->i;
+    Queue *self = ((q_args *)a)->self;
+    Item *i = ((q_args *)a)->i;
 
-    pthread_mutex_lock(&(self->lock));    /* lock */
+    pthread_mutex_lock(&(self->lock));      /* lock */
     if (self->numOfItems == 0)
     {
         self->last = i;
@@ -67,9 +67,9 @@ void *enqueue(void *a)
 
 void *dequeue(void *a)
 {
-    Queue *self = ((args *)a)->self;
+    Queue *self = ((q_args *)a)->self;
 
-    pthread_mutex_lock(&(self->lock));    /* lock */
+    pthread_mutex_lock(&(self->lock));      /* lock */
     if (getNumOfItems(self) > 1)
     {
         Item *temp = getfirst(self);
@@ -108,9 +108,10 @@ Queue *initQueue()
     }
     return q;
 }
+
 void freeQueue(Queue *self)
 {
-    args a = {self, NULL};
+    q_args a = {self, NULL};
 
     int items = getNumOfItems(self);
     for (size_t i = 0; i < items; i++)

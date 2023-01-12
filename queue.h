@@ -34,8 +34,8 @@ Item *getfirst(Queue *self);
 Item *getlast(Queue *self);
 void freeQueue(Queue *self);
 
-typedef struct args
+typedef struct q_args
 {
     Queue *self;
     Item *i;
-} args;
+} q_args;
