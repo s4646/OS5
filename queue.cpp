@@ -33,7 +33,11 @@ Queue::Queue()
     first = nullptr;
     last = nullptr;
 }
-Queue::~Queue() {}
+Queue::~Queue()
+{
+    delete first;
+    delete last;
+}
 int Queue::getNumOfItems() {return numOfItems;}
 Item &Queue::getLast() {return *last;}
 Item &Queue::getFirst() {return *first;}

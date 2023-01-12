@@ -5,7 +5,7 @@ C++ = -lstdc++
 
 all: main
 
-main: queue.o main.o # activeObject.o
+main: queue.o main.o activeObject.o
 	$(CC) $^ -pthread -o main $(C++)
 
 main.o: main.cpp
@@ -14,8 +14,8 @@ main.o: main.cpp
 queue.o: queue.cpp
 	$(CC) $(FLAGS) -c $^ $(C++)
 
-# activeObject.o: activeObject.cpp
-# 	$(CC) $(FLAGS) -c $^ $(C++)
+activeObject.o: activeObject.cpp
+	$(CC) $(FLAGS) -c $^ $(C++)
 
 
 clean:
