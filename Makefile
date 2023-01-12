@@ -6,7 +6,7 @@ C++ = -lstdc++
 all: main
 
 main: queue.o main.o # activeObject.o
-	$(CC) $^ -o main $(C++)
+	$(CC) $^ -pthread -o main $(C++)
 
 main.o: main.cpp
 	$(CC) $(FLAGS) -c $^ $(C++)

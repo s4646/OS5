@@ -41,6 +41,7 @@ Item &Queue::getFirst() {return *first;}
 
 void Queue::enqueue(Item &i)
 {
+    m.lock();
     if (numOfItems == 0)
     {
         last  = &i;
@@ -59,30 +60,30 @@ void Queue::enqueue(Item &i)
         last = &i;
     }
     numOfItems++;
+    m.unlock();
 }
 
 void Queue::dequeue()
 {
+    m.lock();
     if (numOfItems > 1)
     {
         Item &temp = getFirst();
         first = temp.next;
         temp.setNext(nullptr);
-        // temp.~Item();
         numOfItems--;
     }
     else if (numOfItems == 1)
     {
-        // Item &temp = getFirst();
-        last = NULL;
-        first = NULL;
-        // temp.~Item();
+        last = nullptr;
+        first = nullptr;
         numOfItems--;
     }
     else
     {
         throw std::runtime_error("dequeue empty queue is not possible!\n");
     }
+    m.unlock();
 }
 /**
  * END QUEUE

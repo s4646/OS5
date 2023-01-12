@@ -1,6 +1,7 @@
 #pragma once
 
 #include <thread>
+#include <mutex>
 #include <stdexcept>
 
 class Item;
@@ -10,6 +11,7 @@ class Queue
     private:
         Item *first; // to enter queue
         Item *last;  // to enter queue
+        std::mutex m;
         int numOfItems;
 
     public:
