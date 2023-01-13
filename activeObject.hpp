@@ -1,6 +1,8 @@
 #pragma once
 
 #include "queue.hpp"
+#include <iostream>
+#include <unistd.h>
 
 class ActiveObject
 {
@@ -9,6 +11,7 @@ class ActiveObject
         bool isActive;
         std::thread loop;
         void* (*task)(void*);
+        ActiveObject* next;
 
     public:
         ActiveObject();
@@ -16,6 +19,7 @@ class ActiveObject
         ~ActiveObject();
         void activate();
         void deactivate();
+        void setNext(ActiveObject *ao);
         void setTask(void* (*f)(void*));
         void doTask(Item *i);
         

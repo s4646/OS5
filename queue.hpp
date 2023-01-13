@@ -35,6 +35,7 @@ class Item
     public:
         Item();
         Item(void *vp);
+        Item(Item *i);
         ~Item();
         void setInput(void *vp);
         void setOutput(void *vp);

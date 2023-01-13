@@ -17,6 +17,13 @@ Item::Item(void *vp)
     prev = nullptr;
     next = nullptr;    
 }
+Item::Item(Item *i)
+{
+    input = i->input;
+    output = i->output;
+    prev = i->prev;
+    next = i->next;
+}
 Item::~Item() {}
 void Item::setInput(void *vp) {input = vp;}
 void Item::setOutput(void *vp) {output = vp;}
@@ -84,6 +91,10 @@ Item* Queue::dequeue()
     }
     else if (numOfItems == 1)
     {
+        temp = new Item(first);
+        temp->setNext(nullptr);
+        temp->setPrev(nullptr);
+        
         delete first;
         first = nullptr;
         last = nullptr;
@@ -95,8 +106,7 @@ Item* Queue::dequeue()
     numOfItems--;
     m.unlock();
 
-    if (temp != nullptr) delete temp;
-    return nullptr;
+    return temp;
 }
 /**
  * END QUEUE

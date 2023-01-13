@@ -1,19 +1,21 @@
 #include "activeObject.hpp"
-#include <iostream>
-#include <unistd.h>
 
 ActiveObject::ActiveObject()
 {
     dispatchQueue = new Queue();
     isActive = false;
+    next = nullptr;
 }
 ActiveObject::ActiveObject(void* (*f)(void*))
 {
     dispatchQueue = new Queue();
     isActive = false;
     task = f;
+    next = nullptr;
 }
 ActiveObject::~ActiveObject() {delete dispatchQueue;}
+
+void ActiveObject::setNext(ActiveObject *ao) {next = ao;}
 
 void ActiveObject::setTask(void* (*f)(void*)) {task = f;}
 void ActiveObject::doTask(Item *i)
@@ -39,7 +41,7 @@ void busyLoop(ActiveObject *ao)
         
         i->setOutput(ao->task(i->getInput()));
         
-        ao->dispatchQueue->dequeue();
+        delete ao->dispatchQueue->dequeue();
     }
 }
 
