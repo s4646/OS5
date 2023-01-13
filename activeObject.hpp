@@ -8,13 +8,16 @@ class ActiveObject
         Queue *dispatchQueue;
         bool isActive;
         std::thread loop;
+        void* (*task)(void*);
 
     public:
         ActiveObject();
+        ActiveObject(void* (*f)(void*));
         ~ActiveObject();
         void activate();
         void deactivate();
-        void doTask(Item &i);
+        void setTask(void* (*f)(void*));
+        void doTask(Item *i);
         
         friend void busyLoop(ActiveObject *ao);
 };

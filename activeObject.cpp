@@ -7,10 +7,18 @@ ActiveObject::ActiveObject()
     dispatchQueue = new Queue();
     isActive = false;
 }
+ActiveObject::ActiveObject(void* (*f)(void*))
+{
+    dispatchQueue = new Queue();
+    isActive = false;
+    task = f;
+}
 ActiveObject::~ActiveObject() {delete dispatchQueue;}
 
-void ActiveObject::doTask(Item &i)
+void ActiveObject::setTask(void* (*f)(void*)) {task = f;}
+void ActiveObject::doTask(Item *i)
 {
+    usleep(100);
     dispatchQueue->enqueue(i);
 }
 
@@ -27,10 +35,10 @@ void busyLoop(ActiveObject *ao)
             continue;
         }
 
-        Item &i = ao->dispatchQueue->getFirst();
-
-        std::cout << (char *)i.getContent() << "\n";
-
+        Item *i = ao->dispatchQueue->getFirst();
+        
+        i->setOutput(ao->task(i->getInput()));
+        
         ao->dispatchQueue->dequeue();
     }
 }
