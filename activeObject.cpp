@@ -40,8 +40,15 @@ void busyLoop(ActiveObject *ao)
         Item *i = ao->dispatchQueue->getFirst();
         
         i->setOutput(ao->task(i->getInput()));
-        
-        delete ao->dispatchQueue->dequeue();
+
+        if (ao->next == nullptr)
+        {
+            delete ao->dispatchQueue->dequeue();
+        }
+        else
+        {
+            ao->next->doTask(ao->dispatchQueue->dequeue());
+        }
     }
 }
 
@@ -56,6 +63,6 @@ void ActiveObject::deactivate()
     loop.join();
     while(dispatchQueue->getNumOfItems() > 0)
     {
-        dispatchQueue->dequeue();
+        delete dispatchQueue->dequeue();
     }
 }
