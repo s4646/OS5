@@ -7,6 +7,7 @@ class ActiveObject
     private:
         Queue *dispatchQueue;
         bool isActive;
+        std::thread loop;
 
     public:
         ActiveObject();
