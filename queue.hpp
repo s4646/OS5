@@ -17,28 +17,31 @@ class Queue
     public:
         Queue();
         ~Queue();
-        void enqueue(Item &i);
-        void dequeue();
+        void enqueue(Item *i);
+        Item* dequeue();
         int getNumOfItems();
-        Item &getFirst();
-        Item &getLast();
+        Item* getFirst();
+        Item* getLast();
 };
 
 class Item
 {
     private:
-        void *content;
+        void *input;
+        void *output;
         Item *next;
         Item *prev;
 
     public:
         Item();
-        Item(void *content);
+        Item(void *vp);
         ~Item();
-        void setContent(void *c);
+        void setInput(void *vp);
+        void setOutput(void *vp);
+        void* getInput();
+        void* getOutput();
         void setNext(Item *other);
         void setPrev(Item *other);
-        void *getContent();
     
     friend class Queue;
 };

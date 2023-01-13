@@ -5,21 +5,25 @@
 */
 Item::Item()
 {
-    content = nullptr;
+    input = nullptr;
+    output = nullptr;
     prev = nullptr;
     next = nullptr;
 }
-Item::Item(void *c)
+Item::Item(void *vp)
 {
-    content = c;
+    input = vp;
+    output = nullptr;
     prev = nullptr;
     next = nullptr;    
 }
 Item::~Item() {}
-void Item::setContent(void *c) {content = c;}
+void Item::setInput(void *vp) {input = vp;}
+void Item::setOutput(void *vp) {output = vp;}
+void* Item::getInput() {return input;}
+void* Item::getOutput() {return output;}
 void Item::setNext(Item *n) {next = n;}
 void Item::setPrev(Item *p) {prev = p;}
-void *Item::getContent() {return content;}
 /**
  * END ITEM
 */
@@ -39,55 +43,60 @@ Queue::~Queue()
     delete last;
 }
 int Queue::getNumOfItems() {return numOfItems;}
-Item &Queue::getLast() {return *last;}
-Item &Queue::getFirst() {return *first;}
+Item*Queue::getLast() {return last;}
+Item* Queue::getFirst() {return first;}
 
 
-void Queue::enqueue(Item &i)
+void Queue::enqueue(Item *i)
 {
     m.lock();
     if (numOfItems == 0)
     {
-        last  = &i;
-        first = &i;
+        last  = i;
+        first = i;
     }
     else if (numOfItems == 1)
     {
-        last = &i;
+        last = i;
         last->setPrev(first);
         first->setNext(last);
     }
     else
     {
-        i.setPrev(last);
-        last->setNext(&i);
-        last = &i;
+        i->setPrev(last);
+        last->setNext(i);
+        last = i;
     }
     numOfItems++;
     m.unlock();
 }
 
-void Queue::dequeue()
+Item* Queue::dequeue()
 {
     m.lock();
+    Item *temp = nullptr;
     if (numOfItems > 1)
     {
-        Item &temp = getFirst();
-        first = temp.next;
-        temp.setNext(nullptr);
-        numOfItems--;
+        temp = first;
+        first = temp->next;
+        temp->setNext(nullptr);
+        temp->setPrev(nullptr);
     }
     else if (numOfItems == 1)
     {
-        last = nullptr;
+        delete first;
         first = nullptr;
-        numOfItems--;
+        last = nullptr;
     }
     else
     {
         throw std::runtime_error("dequeue empty queue is not possible!\n");
     }
+    numOfItems--;
     m.unlock();
+
+    if (temp != nullptr) delete temp;
+    return nullptr;
 }
 /**
  * END QUEUE
