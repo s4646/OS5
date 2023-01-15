@@ -47,7 +47,9 @@ void busyLoop(ActiveObject *ao)
         }
         else
         {
-            ao->next->doTask(ao->dispatchQueue->dequeue());
+            Item *j = new Item(i->getOutput());
+            delete ao->dispatchQueue->dequeue();
+            ao->next->doTask(j);
         }
     }
 }
