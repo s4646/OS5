@@ -1,7 +1,6 @@
 #pragma once
 
 #include "queue.hpp"
-#include <iostream>
 #include <unistd.h>
 
 class ActiveObject

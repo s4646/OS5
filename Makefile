@@ -5,10 +5,13 @@ C++ = -lstdc++
 
 all: main
 
-main: queue.o main.o activeObject.o pipeline.o
+main: main.o tasks.o queue.o activeObject.o pipeline.o
 	$(CC) $^ -pthread -o main $(C++)
 
 main.o: main.cpp
+	$(CC) $(FLAGS) -c $^ $(C++)
+
+tasks.o: tasks.cpp
 	$(CC) $(FLAGS) -c $^ $(C++)
 
 queue.o: queue.cpp
