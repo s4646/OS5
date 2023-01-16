@@ -3,13 +3,14 @@
 void* print(void* vp)
 {
     std::string *sp = static_cast<std::string*>(vp);
-    std::cout << *sp + "\n";
+    std::cout << "palindrome: " +(*sp) + "\n";
     return vp;
 }
 
 void* removeSpecialChars(void *vp)
 {
     std::string *sp = static_cast<std::string*>(vp);
+    std::cout << "original: " +(*sp) + "\n";
     
     std::string str;
     bool ok;
