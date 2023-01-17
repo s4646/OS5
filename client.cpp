@@ -10,8 +10,8 @@
 
 int main()
 {
-    int sockfd, connfd;
-    struct sockaddr_in servaddr, cli;
+    int sockfd;
+    struct sockaddr_in servaddr;
     int yes = 1;
 
     // socket create and verification
@@ -47,7 +47,7 @@ int main()
     while (true)
     {
         bzero(buff, sizeof(buff));
-        printf("Enter the string: ");
+        printf("Enter string: ");
         n = 0;
 
         while((buff[n++] = getchar()) != '\n') continue;
@@ -59,8 +59,6 @@ int main()
         }
         write(sockfd, buff, sizeof(buff));
         bzero(buff, sizeof(buff));
-        read(sockfd, buff, sizeof(buff));
-        printf("From Server : %s\n", buff);
     }
     close(sockfd);
 

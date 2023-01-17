@@ -1,34 +1,25 @@
-#include <stdio.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h> // read(), write(), close()
+#include "reactor.hpp"
 
-#define PORT "7777"
+// CODE TAKEN FROM https://beej.us/guide/bgnet/html/split/slightly-advanced-techniques.html#select
 
-int main() // CODE TAKEN FROM https://beej.us/guide/bgnet/html/split/slightly-advanced-techniques.html#select
+Reactor::Reactor()
 {
-    fd_set master;    // master file descriptor list
-    fd_set read_fds;  // temp file descriptor list for select()
-    int fdmax;        // maximum file descriptor number
+    pipeline = new Pipeline();
+    pipeline->addToPipeline(&removeSpecialChars);
+    pipeline->addToPipeline(&bigCharsOnly);
+    pipeline->addToPipeline(&isPalindrome);
+    pipeline->addToPipeline(&print);
+    pipeline->startLine();
+}
 
-    int listener;     // listening socket descriptor
-    int newfd;        // newly accept()ed socket descriptor
-    struct sockaddr_storage remoteaddr; // client address
-    socklen_t addrlen;
+Reactor::~Reactor()
+{
+    pipeline->killLine();
+    delete pipeline;
+}
 
-    char buf[256];    // buffer for client data
-    int nbytes;
-
-    int yes = 1;        // for setsockopt() SO_REUSEADDR, below
-    int i, j, rv;
-    int save_in = dup(STDOUT_FILENO); // copy of STDOUT
-
-    struct addrinfo hints, *ai, *p;
-
+void Reactor::initReactor(int maxClients)
+{
     FD_ZERO(&master);    // clear the master and temp sets
     FD_ZERO(&read_fds);
 
@@ -71,7 +62,7 @@ int main() // CODE TAKEN FROM https://beej.us/guide/bgnet/html/split/slightly-ad
     freeaddrinfo(ai); // all done with this
 
     // listen
-    if (listen(listener, 10) == -1)
+    if (listen(listener, maxClients) == -1)
     {
         perror("Error: listen");
         exit(3);
@@ -82,15 +73,23 @@ int main() // CODE TAKEN FROM https://beej.us/guide/bgnet/html/split/slightly-ad
 
     // keep track of the biggest file descriptor
     fdmax = listener; // so far, it's this one
+}
 
+void Reactor::startReactor()
+{
     // main loop
-    for(;;) {
+    for(;;)
+    {
         read_fds = master; // copy it
         if (select(fdmax+1, &read_fds, NULL, NULL, NULL) == -1)
         {
-            perror("Error: select");
+            if (errno != 4)
+            {
+                perror("Error: select");
+            }
             exit(4);
         }
+        bzero(buf, sizeof(buf));
 
         // run through the existing connections looking for data to read
         for(i = 0; i <= fdmax; i++)
@@ -136,17 +135,13 @@ int main() // CODE TAKEN FROM https://beej.us/guide/bgnet/html/split/slightly-ad
                     else
                     {
                         // we got some data from a client
-                        dup2(i, STDOUT_FILENO);
-                        if (send(i, "GOTCHA", 7, 0) == -1)
-                        {
-                            perror("send");
-                        }
-                        dup2(save_in, STDOUT_FILENO);
+                        buf[strlen(buf)-1] = '\0';
+                        std::string s = static_cast<std::string>(buf);
+                        void *vp = static_cast<void*>(&s);
+                        pipeline->getInput(vp);
                     }
                 } // END handle data from client
             } // END got new incoming connection
         } // END looping through file descriptors
     } // END for(;;)--and you thought it would never end!
-    
-    return 0;
 }
