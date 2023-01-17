@@ -48,7 +48,7 @@ void* bigCharsOnly(void *vp)
         if (element >= 48 && element <= 57)  // number
             str += " ";
             
-        if (element >= 97 && element <= 122) // lowercase
+        else if (element >= 97 && element <= 122) // lowercase
             str += (element-32);
         
         else                                 // space or uppercase
