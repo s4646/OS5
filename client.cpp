@@ -12,7 +12,7 @@ int main()
 {
     int sockfd;
     struct sockaddr_in servaddr;
-    int yes = 1;
+    int yes = 1, nbytes;
 
     // socket create and verification
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -36,13 +36,24 @@ int main()
     // connect the client socket to server socket
     if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) != 0) {
         printf("connection with the server failed...\n");
-        exit(0);
+        exit(EXIT_FAILURE);
     }
     else
         printf("connected to the server..\n");
 
-    // close the socket
     char buff[256];
+    bzero(buff, sizeof(buff));
+    if ((nbytes = read(sockfd, buff, sizeof(buff))) == -1)
+    {
+        perror("Error: read");
+        exit(EXIT_FAILURE);
+    }
+    if (nbytes == 0)
+    {
+        printf("Error: Connection refused: full capacity\n");
+        exit(EXIT_FAILURE);
+    }
+
     int n;
     while (true)
     {
@@ -54,7 +65,7 @@ int main()
         
         if ((strncmp(buff, "quit", 4)) == 0)
         {
-            printf("Client Exit...\n");
+            printf("Goodbye!\n");
             break;
         }
         write(sockfd, buff, sizeof(buff));

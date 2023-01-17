@@ -10,13 +10,23 @@ void sigint(int sig)
     std::cout << std::endl;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    if (argc !=2)
+    {
+        std::cout << "Usage: ./main <number>\n";
+        return 0;
+    }
+    if (atoi(argv[1]) < 1 || atoi(argv[1]) > 10)
+    {
+        std::cout << "Number of clients must be between 1-10!\n";
+        return 0;
+    }
+
     signal(SIGINT, sigint);
     r = new Reactor();
-    r->initReactor(2);
+    r->initReactor(atoi(argv[1]));
     r->startReactor();
-    std::cout << "start\n";
 
     return 0;
 }

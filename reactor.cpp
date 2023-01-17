@@ -20,6 +20,8 @@ Reactor::~Reactor()
 
 void Reactor::initReactor(int maxClients)
 {
+    max_clients = maxClients;
+
     FD_ZERO(&master);    // clear the master and temp sets
     FD_ZERO(&read_fds);
 
@@ -77,6 +79,8 @@ void Reactor::initReactor(int maxClients)
 
 void Reactor::startReactor()
 {
+    int sysfds = fdmax;
+    int currfds = fdmax;
     // main loop
     for(;;)
     {
@@ -96,9 +100,22 @@ void Reactor::startReactor()
         {
             if (FD_ISSET(i, &read_fds)) // we got one!!
             {
+                // handle new connections
                 if (i == listener)
                 {
-                    // handle new connections
+                    if (currfds - sysfds >= max_clients) // refuse connection - full capacity
+                    {
+                        addrlen = sizeof(remoteaddr);
+                        newfd = accept(listener, (struct sockaddr *)&remoteaddr, &addrlen);
+                        if (newfd == -1)
+                        {
+                            perror("Error: accept");
+                        }
+                        close(newfd);
+                        printf("Error: Connection refused: full capacity\n");
+                        continue;
+                    }
+
                     addrlen = sizeof(remoteaddr);
                     newfd = accept(listener, (struct sockaddr *)&remoteaddr, &addrlen);
                     if (newfd == -1)
@@ -107,16 +124,17 @@ void Reactor::startReactor()
                     }
                     else
                     {
+                        send(newfd, "\0", 2, 0);
                         FD_SET(newfd, &master); // add to master set
+                        currfds++;
                         if (newfd > fdmax) {    // keep track of the max
                             fdmax = newfd;
                         }
                         printf("selectserver: new connection received\n");
                     }
                 }
-                else
+                else // handle data from a client
                 {
-                    // handle data from a client
                     if ((nbytes = recv(i, buf, sizeof(buf), 0)) <= 0)
                     {
                         // got error or connection closed by client
@@ -131,6 +149,7 @@ void Reactor::startReactor()
                         }
                         close(i); // bye!
                         FD_CLR(i, &master); // remove from master set
+                        currfds--;
                     }
                     else
                     {

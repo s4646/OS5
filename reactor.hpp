@@ -32,7 +32,7 @@ class Reactor
 
         int yes = 1;        // for setsockopt() SO_REUSEADDR, below
         int i, j, rv;
-        int save_in = dup(STDOUT_FILENO); // copy of STDOUT
+        int max_clients;
 
         struct addrinfo hints, *ai, *p;
 
